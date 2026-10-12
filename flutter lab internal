@@ -1,0 +1,190 @@
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const TreeApp());
+}
+
+class TreeApp extends StatelessWidget {
+  const TreeApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: true,
+      title: 'Growing Tree',
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.green,
+        ),
+        useMaterial3: true,
+      ),
+      home: const TreePage(),
+    );
+  }
+}
+
+class TreePage extends StatefulWidget {
+  const TreePage({super.key});
+
+  @override
+  State<TreePage> createState() => _TreePageState();
+}
+
+class _TreePageState extends State<TreePage>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+
+  double _treeSize = 70;
+  bool _isGrown = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    );
+
+    _scaleAnimation = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.elasticOut,
+    );
+  }
+
+  void _growTree() {
+    setState(() {
+      _isGrown = true;
+      _treeSize = 180;
+    });
+
+    _controller.forward(from: 0);
+  }
+
+  void _resetTree() {
+    setState(() {
+      _isGrown = false;
+      _treeSize = 70;
+    });
+
+    _controller.reverse(from: 1);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFFE8F5E9),
+      appBar: AppBar(
+        title: const Text('Growing Tree Animation'),
+        centerTitle: true,
+        backgroundColor: Colors.green,
+        foregroundColor: Colors.white,
+      ),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.eco,
+                size: 45,
+                color: Colors.green,
+              ),
+              const SizedBox(height: 10),
+              const Text(
+                'Grow a Greener Tomorrow!',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 23,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.green,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                _isGrown
+                    ? 'Your tree has grown!'
+                    : 'Tap the button to grow your tree.',
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 16),
+              ),
+              const SizedBox(height: 25),
+              AnimatedContainer(
+                duration: const Duration(seconds: 2),
+                curve: Curves.easeInOut,
+                width: double.infinity,
+                height: 280,
+                decoration: BoxDecoration(
+                  color: _isGrown ? const Color(0xFFC8E6C9) : Colors.white,
+                  borderRadius: BorderRadius.circular(25),
+                  border: Border.all(
+                    color: Colors.green.shade200,
+                    width: 2,
+                  ),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ScaleTransition(
+                      scale: _scaleAnimation,
+                      child: Text(
+                        _isGrown ? '🌳' : '🌱',
+                        style: TextStyle(fontSize: _treeSize),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    const Icon(
+                      Icons.grass,
+                      color: Colors.brown,
+                      size: 40,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 25),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: _isGrown ? null : _growTree,
+                  icon: const Icon(Icons.park),
+                  label: const Text('Grow Tree'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.all(15),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+              OutlinedButton.icon(
+                onPressed: _isGrown ? _resetTree : null,
+                icon: const Icon(Icons.refresh),
+                label: const Text('Reset Tree'),
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                'SDG 13: Climate Action 🌍',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.green,
+                ),
+              ),
+              const Text(
+                'Plant trees today for a greener tomorrow.',
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
